@@ -16,7 +16,7 @@ program
   .requiredOption("--csr <path>", "Path to the CSR CSV file")
   .action(main);
 
-const DELTAS: DeltaString[] = ["10d", "1m", "2m", "6m", "1y"];
+const DELTAS: DeltaString[] = ["10d", "1m", "1y"];
 
 async function main(options: { safeZones: string; csr: string }) {
   const safeZonesIndex = (await loadJSONFile(options.safeZones)) as Record<
