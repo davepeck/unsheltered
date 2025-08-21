@@ -6,7 +6,7 @@ csr_path := env("CSR_PATH", "/tmp/csr-" + date + ".csv")
 simple_reports_path := env("SIMPLE_REPORTS_PATH", "/tmp/simple_reports.json")
 overall_report_path := env("OVERALL_REPORT_PATH", "/tmp/overall_report.json")
 
-default: do_it download_csr simple_reports overall_report
+default: download_csr simple_reports overall_report
 	@echo "Pipeline complete!"
 	
 download_csr:
