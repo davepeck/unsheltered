@@ -4,9 +4,9 @@ import { outsetSafeZones, safeZones } from "../pipe/safeZones";
 import { makeIdIndex } from "../utils/indexed";
 import { stringifyJSON } from "../utils/json";
 
-// This script requires a full extract of the Seattle OSM data, in XML 
+// This script requires a full extract of the Seattle OSM data, in XML
 // format, to be available at the specified path.
-// 
+//
 // The specific expected bounding box is:
 // <bounds minlat="47.4955000" minlon="-122.4360000" maxlat="47.7342000" maxlon="-122.2361000"/>
 
