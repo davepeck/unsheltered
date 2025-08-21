@@ -206,8 +206,8 @@ const filterZonesForReports = (
 };
 
 const SimpleReportsMap: React.FC<SimpleReportsMapProps> = (props) => {
-  const [selectedReport, setSelectedReport] =
-    useState<ReportWithSafeZoneIds | null>(null);
+  // const [selectedReport, setSelectedReport] =
+  //   useState<ReportWithSafeZoneIds | null>(null);
 
   const onConfigureMap = useCallback(
     (map: L.Map, data: SimpleReportsMapData) => {
@@ -261,7 +261,7 @@ const SimpleReportsMap: React.FC<SimpleReportsMapProps> = (props) => {
 
         marker.on("popupopen", () => {
           console.log("Popup opened for report:", report);
-          setSelectedReport(report);
+          // setSelectedReport(report);
         });
       }
     },
