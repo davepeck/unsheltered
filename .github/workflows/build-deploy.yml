@@ -28,6 +28,7 @@ concurrency:
 jobs:
   build_deploy:
     env:
+      SAFE_ZONES_PATH: data/safe_zones.json
       CSR_PATH: data-build/csr.csv
       SIMPLE_REPORTS_PATH: data-build/simple_reports.json
       OVERALL_REPORT_PATH: data-build/overall_report.json

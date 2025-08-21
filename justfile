@@ -1,7 +1,7 @@
 # Get the current date in YYYY-MM-DD format
 date := `TZ=America/Los_Angeles date +%Y-%m-%d`
 
-safe_zones_path := justfile_directory() + "/data/safe_zones.json"
+safe_zones_path := env("SAFE_ZONES_PATH", justfile_directory() + "/data/safe_zones.json")
 csr_path := env("CSR_PATH", "/tmp/csr-" + date + ".csv")
 simple_reports_path := env("SIMPLE_REPORTS_PATH", "/tmp/simple_reports.json")
 overall_report_path := env("OVERALL_REPORT_PATH", "/tmp/overall_report.json")
