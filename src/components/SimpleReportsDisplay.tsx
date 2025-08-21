@@ -5,7 +5,7 @@ import { getItemName } from "../osm/items";
 import {
   type ReportKind,
   type ReportWithSafeZoneIds,
-  getReportKey,
+  // getReportKey,
 } from "../pipe/reports";
 import {
   type SlimReportsWithTimelines,
@@ -28,16 +28,16 @@ import Select from "./Select";
 import clsx from "clsx";
 import { fastMax } from "../utils/fastMath";
 import ReactDOMServer from "react-dom/server";
-import HistogramChart from "./HistogramChart";
+// import HistogramChart from "./HistogramChart";
 import { assertNever } from "../utils/assert";
 
 interface SimpleReportsMapData {
   showReports: ReportWithSafeZoneIds[];
   showZones: SafeZone[];
   safeZonesIndex: Record<string, SafeZone>;
-  histograms: Record<string, SlimReportHistogramData>;
-  histogramMax?: number;
-  histogramLabels: string[];
+  // histograms: Record<string, SlimReportHistogramData>;
+  // histogramMax?: number;
+  // histogramLabels: string[];
 }
 
 interface SimpleReportsMapProps extends OuterMapProps<SimpleReportsMapData> {
@@ -105,11 +105,11 @@ const SafeZonePopup: React.FC<{ zone: SafeZone }> = ({ zone }) => (
 const ReportPopup: React.FC<{
   report: ReportWithSafeZoneIds;
   safeZonesIndex: Record<string, SafeZone>;
-  historicalCount: number;
+  // historicalCount: number;
   windowDescription: string;
   srhd?: SlimReportHistogramData;
   histogramLabels?: string[];
-}> = ({ report, safeZonesIndex, historicalCount, windowDescription }) => {
+}> = ({ report, safeZonesIndex, /* historicalCount, */ windowDescription }) => {
   return (
     <div>
       <strong>{REPORT_KINDS[report.kind].singular}</strong>
@@ -117,8 +117,8 @@ const ReportPopup: React.FC<{
       <strong>{report.count}</strong>{" "}
       {report.count === 1 ? "report" : "reports"} in the {windowDescription}
       <br />
-      <strong>{historicalCount}</strong> since reporting began (June 2022)
-      <br />
+      {/* <strong>{historicalCount}</strong> since reporting began (June 2022)
+      <br /> */}
       <br />
       {formatStreetAddress(report.loc)}
       {report.safeZoneIds.length > 0 ? (
@@ -251,9 +251,9 @@ const SimpleReportsMap: React.FC<SimpleReportsMapProps> = (props) => {
                 report={report}
                 safeZonesIndex={data.safeZonesIndex}
                 windowDescription={props.windowDescription}
-                historicalCount={
-                  data.histograms[getReportKey(report)].historicalCount
-                }
+                // historicalCount={
+                //   data.histograms[getReportKey(report)].historicalCount
+                // }
               />
             )
           )
@@ -277,56 +277,6 @@ const SimpleReportsMap: React.FC<SimpleReportsMapProps> = (props) => {
         data={props.data}
         className={props.className}
       />
-      {selectedReport ? (
-        <div className="p-4 bg-white/80 rounded-lg shadow-lg mb-4">
-          <strong>{REPORT_KINDS[selectedReport.kind].singular}</strong>
-          <br />
-          {formatStreetAddress(selectedReport.loc)}
-          <br />
-          <strong>{selectedReport.count}</strong> reports in the{" "}
-          {props.windowDescription}
-          <br />
-          <strong>
-            {
-              props.data.histograms[getReportKey(selectedReport)]
-                .historicalCount
-            }
-          </strong>{" "}
-          since reporting began (June 2022)
-          <br />
-          {selectedReport.safeZoneIds.length > 0 ? (
-            <>
-              <strong>
-                In safe{" "}
-                {selectedReport.safeZoneIds.length > 1 ? "zones" : "zone"}
-              </strong>
-              :{" "}
-              {selectedReport.safeZoneIds
-                .map((id) => props.data.safeZonesIndex[id])
-                .map(getItemName)
-                .join(", ")}
-            </>
-          ) : null}
-          <br />
-          <br />
-          <div className="-mb-8">
-            {props.data.histograms[getReportKey(selectedReport)] &&
-            props.data.histogramLabels ? (
-              <HistogramChart
-                buckets={
-                  props.data.histograms[getReportKey(selectedReport)].buckets
-                }
-                labels={props.data.histogramLabels}
-                title="Historical Reports"
-                color={REPORT_KINDS[selectedReport.kind].color}
-                max={props.data.histogramMax}
-              />
-            ) : (
-              <div className="text-center">No histogram data available</div>
-            )}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 };
@@ -373,10 +323,10 @@ const MARKER_SIZE_OPTIONS: { label: string; size: "fixed" | "relative" }[] = [
   { label: "Number of reports", size: "relative" },
 ];
 
-const HISTOGRAM_OPTIONS: { label: string; max: "fixed" | "flexible" }[] = [
-  { label: "Fixed", max: "fixed" },
-  { label: "Flexible", max: "flexible" },
-];
+// const HISTOGRAM_OPTIONS: { label: string; max: "fixed" | "flexible" }[] = [
+//   { label: "Fixed", max: "fixed" },
+//   { label: "Flexible", max: "flexible" },
+// ];
 
 const SimpleReportsDisplay: React.FC<SimpleReportsDisplayProps> = (props) => {
   const { dataId } = props;
@@ -388,7 +338,7 @@ const SimpleReportsDisplay: React.FC<SimpleReportsDisplayProps> = (props) => {
   const [thresholdIndex, setThresholdIndex] = useState(0);
   const [safeZoneIndex, setSafeZoneIndex] = useState(0);
   const [markerSizeIndex, setMarkerSizeIndex] = useState(0);
-  const [histogramIndex, setHistogramIndex] = useState(0);
+  // const [histogramIndex, setHistogramIndex] = useState(0);
 
   if (!simpleReports) return null;
 
@@ -473,12 +423,12 @@ const SimpleReportsDisplay: React.FC<SimpleReportsDisplayProps> = (props) => {
           onSelect={setMarkerSizeIndex}
           className="max-w-[50%]"
         />
-        <Select
+        {/* <Select
           title="Histogram Max:"
           options={HISTOGRAM_OPTIONS.map((t) => t.label)}
           onSelect={setHistogramIndex}
           className="max-w-[50%]"
-        />
+        /> */}
       </div>
 
       <label className="block font-bold text-sm md:-mt-4 mb-4">Show:</label>
@@ -574,12 +524,12 @@ const SimpleReportsDisplay: React.FC<SimpleReportsDisplayProps> = (props) => {
           showReports,
           showZones,
           safeZonesIndex: simpleReports.safeZonesIndex,
-          histograms: simpleReports.histograms,
-          histogramMax:
-            HISTOGRAM_OPTIONS[histogramIndex].max == "fixed"
-              ? Math.ceil(simpleReports.histogramMax / 10) * 10
-              : undefined,
-          histogramLabels: simpleReports.histogramMeta.labels,
+          // histograms: simpleReports.histograms,
+          // histogramMax:
+          //   HISTOGRAM_OPTIONS[histogramIndex].max == "fixed"
+          //     ? Math.ceil(simpleReports.histogramMax / 10) * 10
+          //     : undefined,
+          // histogramLabels: simpleReports.histogramMeta.labels,
         }}
         windowDescription={windowDescription}
         markerSize={MARKER_SIZE_OPTIONS[markerSizeIndex].size}

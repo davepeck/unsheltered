@@ -247,16 +247,16 @@ export type SlimReportHistogramData = Omit<ReportHistogramData, "histogram"> & {
 };
 
 export interface SlimReportsWithTimelines extends SimpleReports {
-  histogramMeta: {
-    /** Start date for all histograms. */
-    start: Date;
+  // histogramMeta: {
+  //   /** Start date for all histograms. */
+  //   start: Date;
 
-    /** End date for all histograms. */
-    end: Date;
+  //   /** End date for all histograms. */
+  //   end: Date;
 
-    /** Representative dates for all histograms. */
-    labels: string[];
-  };
+  //   /** Representative dates for all histograms. */
+  //   labels: string[];
+  // };
 
   /** A timeline of all reports in a given timeframe of a given kind. */
   timelines: Record<ReportKind, number[]>;
@@ -264,11 +264,11 @@ export interface SlimReportsWithTimelines extends SimpleReports {
   /** The maximum histogram value for any timeline. */
   timelineMax: number;
 
-  /** For each unique report key, a histogram */
-  histograms: Record<string, SlimReportHistogramData>;
+  // /** For each unique report key, a histogram */
+  // histograms: Record<string, SlimReportHistogramData>;
 
-  /** The maximum histogram value for any report. */
-  histogramMax: number;
+  // /** The maximum histogram value for any report. */
+  // histogramMax: number;
 }
 
 /** Build a slim simplified report data structure with bonus timeline information. */
@@ -291,38 +291,40 @@ export async function getSlimReports(
     kinds
   );
   console.error("Slimming down reports...");
-  const { timelines, histogramMax, histograms, timelineMax } = fat;
-  const histogramMeta = {
-    start,
-    end,
-    labels: Array.from(
-      Object.keys(timelines[DEFAULT_KINDS[0][1]].histogram.data)
-    ),
-  };
+  const { timelines, /* histogramMax, histograms, */ timelineMax } = fat;
+  // const histogramMeta = {
+  //   start,
+  //   end,
+  //   labels: Array.from(
+  //     Object.keys(timelines[DEFAULT_KINDS[0][1]].histogram.data)
+  //   ),
+  // };
   const slimTimelines = Object.fromEntries(
     Object.entries(timelines).map(([kind, timeline]) => [
       kind,
       Object.values(timeline.histogram.data),
     ])
   ) as Record<ReportKind, number[]>;
-  const slimHistograms = Object.fromEntries(
-    Object.entries(histograms).map(
-      ([key, { historicalCount, histogramMax, histogram }]) => [
-        key,
-        {
-          historicalCount,
-          histogramMax,
-          buckets: Object.values(histogram.data),
-        },
-      ]
-    )
-  ) as Record<string, SlimReportHistogramData>;
+  // const slimHistograms = Object.fromEntries(
+  //   Object.entries(histograms).map(
+  //     ([key, { historicalCount, histogramMax, histogram }]) => [
+  //       key,
+  //       {
+  //         historicalCount,
+  //         histogramMax,
+  //         buckets: Object.values(histogram.data),
+  //       },
+  //     ]
+  //   )
+  // ) as Record<string, SlimReportHistogramData>;
   return {
-    ...fat,
-    histogramMeta,
+    safeZonesIndex: fat.safeZonesIndex,
+    windowResults: fat.windowResults,
+    lastDate: fat.lastDate,
+    // histogramMeta,
     timelines: slimTimelines,
-    histogramMax,
-    histograms: slimHistograms,
+    // histogramMax,
+    // histograms: slimHistograms,
     timelineMax,
   };
 }
