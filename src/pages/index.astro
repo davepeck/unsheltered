@@ -1,0 +1,22 @@
+---
+import Prose from "../layouts/Prose.astro";
+import SimpleReportsDisplay from "../components/SimpleReportsDisplay.tsx";
+import DataLoader from "../components/DataLoader.astro";
+---
+
+<Prose title="Unsheltered Seattle">
+  <h1>Unsheltered Seattle</h1>
+  <p>Understanding Seattle's unsheltered population through data.</p>
+
+  <h2>Customer service reports</h2>
+  <DataLoader
+    id="simpleReports"
+    path={process.env.SIMPLE_REPORTS_PATH}
+    defaultPath="/tmp/simple_reports.json"
+  />
+  <SimpleReportsDisplay client:only dataId="simpleReports" />
+  <p>
+    You can also explore <a href="/safe-zones/">our designated safe zones</a>,
+    look at <a href="/overall/">overall trends</a>.
+  </p>
+</Prose>

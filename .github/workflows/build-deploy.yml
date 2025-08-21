@@ -1,0 +1,83 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Run once a day, at 6PM UTC (10 or 11AM Pacific Time, depending on daylight savings)
+  schedule:
+    - cron: "0 18 * * *"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build_deploy:
+    env:
+      CSR_PATH: data-build/csr.csv
+      SIMPLE_REPORTS_PATH: data-build/simple_reports.json
+      OVERALL_REPORT_PATH: data-build/overall_report.json
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Install just
+        uses: extractions/setup-just@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install
+      - name: Set cache key based on date (YYYY-MM-DD)
+        run: echo "CACHE_DATE=$(TZ=America/Los_Angeles date +%Y-%m-%d)" >> $GITHUB_ENV
+        env:
+          TZ: America/Los_Angeles
+      - name: Restore cached downloaded data
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.CSR_PATH }}
+          key: cached-files-d-${{ env.CACHE_DATE }}
+      - name: Ensure built data directory exists
+        run: mkdir -p data-build
+      - name: Check formatting, linting, and types
+        run: npm run check
+      - name: Run tests
+        run: npm run test
+        env:
+          CI: true
+      - name: Run data pipeline
+        run: just
+      - name: Build static site
+        run: npm run build
+      # Consider: move this step to a separate job and use
+      # artifacts to pass the build output to the deployment job?
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./dist"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

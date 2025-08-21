@@ -1,0 +1,20 @@
+---
+import Prose from "../layouts/Prose.astro";
+import SafeZonesDisplay from "../components/SafeZonesDisplay.tsx";
+import DataLoader from "../components/DataLoader.astro";
+---
+
+<Prose>
+  <h2>Safe zones</h2>
+  <p>
+    The following map shows areas where camping is considered less desirable,
+    including public schools, parks, libraries, and child care centers.
+  </p>
+
+  <DataLoader
+    id="safeZones"
+    path={process.env.SAFE_ZONES_PATH}
+    defaultPath="/tmp/safe_zones.json"
+  />
+  <SafeZonesDisplay client:only dataId="safeZones" />
+</Prose>

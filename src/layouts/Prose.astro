@@ -1,0 +1,18 @@
+---
+import Layout from "./Layout.astro";
+const props = Astro.props;
+---
+
+<Layout {...props}>
+  <div
+    class="mx-4 md:mx-auto md:max-w-2xl py-8 text-lg !space-y-4 text-gray-800 font-sans
+    prose
+    prose-headings:font-bold prose-headings:font-plein
+    prose-h1:text-5xl prose-h1:text-black
+    prose-h2:text-3xl prose-h2:pt-4
+    prose-p:mt-0
+    prose-a:underline prose-a:text-blue-800 prose-a:hover:text-blue-400 prose-a:transition-colors prose-a:duration-200"
+  >
+    <slot />
+  </div>
+</Layout>

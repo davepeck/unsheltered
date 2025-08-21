@@ -1,0 +1,46 @@
+{
+	"python.testing.unittestEnabled": true,
+	"[python]": {
+		"editor.defaultFormatter": "charliermarsh.ruff",
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.ruff": "explicit",
+			"source.organizeImports.ruff": "explicit"
+		}
+	},
+	"[javascript][typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.organizeImports": "explicit"
+		}
+	},
+	"prettier.resolveGlobalModules": false,
+	"editor.tokenColorCustomizations": {
+		"textMateRules": [
+			{
+				"scope": [
+					"comment",
+					"keyword",
+					"storage",
+					"string",
+					"constant",
+					"variable",
+					"entity.name",
+					"entity.other",
+					"entity",
+					"support",
+					"markup",
+					"meta",
+					"invalid",
+					"punctuation",
+					"source"
+				],
+				"settings": {
+					"fontStyle": ""
+				}
+			}
+		]
+	}
+}

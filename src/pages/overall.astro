@@ -1,0 +1,21 @@
+---
+import Prose from "../layouts/Prose.astro";
+import OverallReportDisplay from "../components/OverallReportDisplay.tsx";
+import DataLoader from "../components/DataLoader.astro";
+---
+
+<Prose title="Unsheltered Seattle">
+  <h1>Overall Trends</h1>
+
+  <h2>Customer service reports</h2>
+  <DataLoader
+    id="overallReport"
+    path={process.env.OVERALL_REPORT_PATH}
+    defaultPath="/tmp/overall_report.json"
+  />
+  <OverallReportDisplay client:only dataId="overallReport" />
+  <p>
+    You can also explore <a href="/safe-zones/">our designated safe zones</a>,
+    look at <a href="/">current data</a>.
+  </p>
+</Prose>

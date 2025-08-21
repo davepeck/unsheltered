@@ -1,0 +1,14 @@
+---
+import { loadJSONFile, stringifyJSON } from "../utils/json";
+
+const { path, defaultPath, id } = Astro.props as {
+  path?: string;
+  defaultPath: string;
+  id: string;
+};
+
+const dataPath = path || defaultPath;
+const data = await loadJSONFile(dataPath);
+---
+
+<script id={id} type="application/json" set:html={stringifyJSON(data)} />
