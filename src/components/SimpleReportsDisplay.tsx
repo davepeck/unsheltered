@@ -31,6 +31,92 @@ import ReactDOMServer from "react-dom/server";
 // import HistogramChart from "./HistogramChart";
 import { assertNever } from "../utils/assert";
 
+interface StateURLParameters {
+  timeframe?: string;
+  kinds?: string[];
+  threshold?: number;
+  safeZones?: string;
+  markerSize?: "fixed" | "relative";
+  // histogramMax?: "fixed" | "flexible";
+}
+
+const getParametersFromURL = (): StateURLParameters => {
+  const params = new URLSearchParams(window.location.search);
+
+  let timeframe: string | undefined = undefined;
+  const timeframeParam = params.get("timeframe");
+  if (timeframeParam) {
+    timeframe = timeframeParam;
+  }
+
+  let kinds: string[] | undefined = [];
+  const kindsParam = params.getAll("kind");
+  // ensure all kinds are valid -- that is, they are keys in REPORT_KINDS
+  if (kindsParam.length > 0) {
+    for (const kind of kindsParam) {
+      if (kind in REPORT_KINDS) {
+        kinds.push(kind);
+      }
+    }
+  }
+  if (kinds.length === 0) {
+    kinds = undefined;
+  }
+
+  let threshold: number | undefined = undefined;
+  const thresholdParam = params.get("threshold");
+  if (thresholdParam) {
+    const parsed = parseInt(thresholdParam, 10);
+    if (!isNaN(parsed)) {
+      // make sure it's a threshold we support in THRESHOLDS
+      const validThresholds = THRESHOLDS.map((t) => t.threshold);
+      if (validThresholds.includes(parsed)) {
+        threshold = parsed;
+      }
+    }
+  }
+
+  let safeZones: string | undefined;
+  const safeZonesParam = params.get("safeZones");
+  if (safeZonesParam) {
+    // must be one of the keys in SAFE_ZONE_KINDS, or "no", "all", or "intersect"
+    if (
+      safeZonesParam === "no" ||
+      safeZonesParam === "all" ||
+      safeZonesParam === "intersect" ||
+      safeZonesParam in SAFE_ZONE_KINDS
+    ) {
+      safeZones = safeZonesParam;
+    }
+  }
+
+  let markerSize: "fixed" | "relative" | undefined = undefined;
+  const markerSizeParam = params.get("markerSize");
+  if (markerSizeParam) {
+    if (markerSizeParam === "fixed" || markerSizeParam === "relative") {
+      markerSize = markerSizeParam;
+    }
+  }
+
+  // let histogramMax: "fixed" | "flexible" | undefined = undefined;
+  // const histogramMaxParam = params.get("histogramMax");
+  // if (histogramMaxParam) {
+  //   if (histogramMaxParam === "fixed" || histogramMaxParam === "flexible") {
+  //     histogramMax = histogramMaxParam;
+  //   }
+  // }
+
+  const result: StateURLParameters = {
+    timeframe,
+    kinds,
+    threshold,
+    safeZones,
+    markerSize /*, histogramMax */,
+  };
+
+  return result;
+};
+
 interface SimpleReportsMapData {
   showReports: ReportWithSafeZoneIds[];
   showZones: SafeZone[];
@@ -331,16 +417,55 @@ const MARKER_SIZE_OPTIONS: { label: string; size: "fixed" | "relative" }[] = [
 const SimpleReportsDisplay: React.FC<SimpleReportsDisplayProps> = (props) => {
   const { dataId } = props;
   const simpleReports = useDataLoader<SlimReportsWithTimelines>(dataId);
-  const [selectedWindowIndex, setSelectedWindowIndex] = useState(0);
-  const [enabledReportKinds, setEnabledReportKinds] = useState<Set<ReportKind>>(
-    new Set(["encampment"])
-  );
-  const [thresholdIndex, setThresholdIndex] = useState(0);
-  const [safeZoneIndex, setSafeZoneIndex] = useState(0);
-  const [markerSizeIndex, setMarkerSizeIndex] = useState(0);
-  // const [histogramIndex, setHistogramIndex] = useState(0);
 
-  if (!simpleReports) return null;
+  if (!simpleReports) {
+    return <div>Loading...</div>;
+  }
+
+  // process URL parameters for initial state, if any
+  const fromURL = getParametersFromURL();
+  const initialWindowIndex = fromURL.timeframe
+    ? Math.max(
+        0,
+        simpleReports.windowResults.findIndex(
+          (wr) =>
+            `${wr.window.delta.amount}${wr.window.delta.unit}` ===
+            fromURL.timeframe
+        )
+      )
+    : 0;
+  const initialKinds = fromURL.kinds
+    ? (new Set(fromURL.kinds) as Set<ReportKind>)
+    : new Set<ReportKind>(["encampment"]);
+  const initialThresholdIndex = fromURL.threshold
+    ? THRESHOLDS.findIndex((t) => t.threshold === fromURL.threshold)
+    : 0;
+  const initialSafeZoneIndex = fromURL.safeZones
+    ? SAFE_ZONE_OPTIONS.findIndex((option) => {
+        if (!option.single) {
+          return option.show === fromURL.safeZones;
+        } else {
+          return option.kind === fromURL.safeZones;
+        }
+      })
+    : 0;
+  const initialMarkerSizeIndex = fromURL.markerSize
+    ? MARKER_SIZE_OPTIONS.findIndex((t) => t.size === fromURL.markerSize)
+    : 0;
+  // const initialHistogramIndex = fromURL.histogramMax
+  //  ? HISTOGRAM_OPTIONS.findIndex((t) => t.max === fromURL.histogramMax)
+  //  : 0;
+
+  const [selectedWindowIndex, setSelectedWindowIndex] =
+    useState(initialWindowIndex);
+  const [enabledReportKinds, setEnabledReportKinds] =
+    useState<Set<ReportKind>>(initialKinds);
+  const [thresholdIndex, setThresholdIndex] = useState(initialThresholdIndex);
+  const [safeZoneIndex, setSafeZoneIndex] = useState(initialSafeZoneIndex);
+  const [markerSizeIndex, setMarkerSizeIndex] = useState(
+    initialMarkerSizeIndex
+  );
+  // const [histogramIndex, setHistogramIndex] = useState(initialHistogramIndex);
 
   const windowResult = simpleReports.windowResults[selectedWindowIndex];
   const { window, result: allReports } = windowResult;
@@ -409,24 +534,28 @@ const SimpleReportsDisplay: React.FC<SimpleReportsDisplayProps> = (props) => {
           title="Number of reports:"
           options={THRESHOLDS.map((t) => t.label)}
           onSelect={setThresholdIndex}
+          selectedIndex={thresholdIndex}
           className="max-w-[50%]"
         />
         <Select
           title="Safe Zones:"
           options={SAFE_ZONE_OPTIONS.map((t) => t.label)}
           onSelect={setSafeZoneIndex}
+          selectedIndex={safeZoneIndex}
           className="max-w-[50%]"
         />
         <Select
           title="Marker Size:"
           options={MARKER_SIZE_OPTIONS.map((t) => t.label)}
           onSelect={setMarkerSizeIndex}
+          selectedIndex={markerSizeIndex}
           className="max-w-[50%]"
         />
         {/* <Select
           title="Histogram Max:"
           options={HISTOGRAM_OPTIONS.map((t) => t.label)}
           onSelect={setHistogramIndex}
+          selectedIndex={histogramIndex}
           className="max-w-[50%]"
         /> */}
       </div>

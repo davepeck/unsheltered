@@ -5,6 +5,7 @@ export interface SelectProps {
   title: string;
   options: (string | number)[];
   onSelect: (index: number) => void;
+  selectedIndex?: number;
   className?: string;
 }
 
@@ -12,6 +13,7 @@ const Select: React.FC<SelectProps> = ({
   title,
   options,
   onSelect,
+  selectedIndex,
   className,
 }) => {
   return (
@@ -26,7 +28,7 @@ const Select: React.FC<SelectProps> = ({
         <select
           id={title}
           name={title}
-          defaultValue={options[0]}
+          defaultValue={options[selectedIndex ?? 0]}
           className={clsx(
             "col-start-1 row-start-1",
             "w-full appearance-none rounded-md",
