@@ -5,6 +5,8 @@ An experimental/toy data pipeline to build encampment and mapping visualizations
 
 Website, updated daily: https://unsheltered.davepeck.org/
 
+More details in my blog post: https://davepeck.org/2025/08/22/unsheltered-seattle/
+
 ### Using this code
 
 To try it locally:
